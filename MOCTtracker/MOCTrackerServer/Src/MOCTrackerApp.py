@@ -15,6 +15,15 @@ def getTrack(track_id):
     response = json.dumps(track)
     return response
 
+def getTracks():
+    try:
+        tracks = MOCTrackerData.getTracks()
+    except:
+        raise
+    response = json.dumps(tracks)
+    return response
+
+
 def insertTrack(inTrack):
     try:
         track = MOCTrackerData.insertTrack(inTrack)

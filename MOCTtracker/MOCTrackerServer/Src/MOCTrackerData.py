@@ -29,6 +29,29 @@ def getTrack (track_id):
     track = buildTrack(row)
     return track
 
+def getTracks ():
+    try:
+        db = psycopg2.connect(connect)
+    except:
+        raise ("Unable to connect to the database", 500)   
+     
+    cur = db.cursor()
+    
+    SQL="SELECT * FROM moctracker.tracks;"
+#    data=(track_id, )
+    cur.execute(SQL, )
+    if cur.rowcount > 0:
+        rows = cur.fetchall()
+    else:
+        raise ('Track not found', 404)
+    tracks = []
+    for row in rows:    
+        track = buildTrack(row)
+        tracks.append(track)
+    return tracks
+
+
+
 def insertTrack(inTrack):
     try:
         db = psycopg2.connect(connect)

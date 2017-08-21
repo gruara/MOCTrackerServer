@@ -16,8 +16,9 @@ def hello_world():
 
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['GET'])
 def get_all():
-    resp = 'You going to get it all'
-    return resp
+#    resp = 'You going to get it all'
+    tracks = MOCTrackerApp.getTracks()
+    return tracks
 
 @app.route('/MOCTracker/api/v1.0/tracks/<int:track_id>', methods=['GET'])
 def get_track(track_id):
