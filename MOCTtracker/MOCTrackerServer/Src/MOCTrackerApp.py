@@ -6,6 +6,26 @@ Created on 20 Jul 2017
 
 import MOCTrackerData
 import json
+from passlib.hash import pbkdf2_sha256
+
+def login(username, password):
+#    print (type(username))
+    user=MOCTrackerData.getUser(username)
+    if user == None:
+        storedhash = None
+    else:
+        storedhash=user['password']
+        if pbkdf2_sha256.verify(password, storedhash):
+            print ('Password OK')
+        else:
+            storedhash = None
+    
+#    hash = pbkdf2_sha256.hash(password)
+#    print (hash)
+    return storedhash
+
+
+
 
 def getTrack(track_id):
     try:
@@ -38,7 +58,10 @@ def getUser(user_id):
         user = MOCTrackerData.getUser(user_id)
     except:
         raise
-    response = json.dumps(user)
+    if user == None:
+        respone = None
+    else:
+        response = json.dumps(user)
     return response
 
 def insertUser(inUser):

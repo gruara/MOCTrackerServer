@@ -75,20 +75,26 @@ def getUser (user_id):
         db = psycopg2.connect(connect)
     except:
         raise ("Unable to connect to the database", 500)   
-     
+#    print (type(user_id))
+    if isinstance(user_id, str):
+        userid = user_id
+    else:
+        userid = str(user_id, 'utf-8')
+        
     cur = db.cursor()
-    SQL="SELECT * FROM moctracker.users WHERE user_id = %s;"
-    data=(user_id, )
+    SQL="SELECT id, user_id, name, created_on, password FROM moctracker.users WHERE user_id = %s;"
+    data=(userid, )
     cur.execute(SQL, data)
-#    yy=cur.mogrify(SQL, data)
-#    print(yy)
-    
+#     yy=cur.mogrify(SQL, data)
+#     print(yy)
+#     print (cur.rowcount)
     if cur.rowcount == 1:
         row = cur.fetchone()
+        user = buildUser(row)
     else:
-        raise ('Track not found', 404)
+        user = None
         
-    user = buildUser(row)
+
     return user
 
 def insertUser(inUser):
@@ -118,6 +124,7 @@ def buildTrack(row):
             'track_id': row[0],
             'user_id' : row[1],
             'created_on' : created_on
+
         }
     return track
 
@@ -128,8 +135,10 @@ def buildUser(row):
             'id': row[0],
             'user_id' : row[1],
             'name' : row[2],
-            'created_on' : created_on
+            'created_on' : created_on,
+            'password' : row[4]
         }
+#    print(row[4])
     return user
 
 if __name__ == '__main__':

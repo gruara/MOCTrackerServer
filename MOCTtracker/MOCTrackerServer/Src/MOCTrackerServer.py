@@ -7,12 +7,27 @@ from flask import Flask, abort, request, jsonify
 from flask import abort
 import MOCTrackerApp
 import json
+from base64 import b64decode
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
     return 'Go away'
+
+@app.route('/MOCTracker/api/v1.0/login', methods=['GET'])
+def login():
+    
+    authorization64=request.headers.get('Authorization')
+    authorization=b64decode(authorization64)
+
+# b':' is used in split as getting error ' bytes-like object is required, not 'str'' without it'
+    username, password=authorization.split(b':', 1)
+    token=MOCTrackerApp.login(username, password)
+    if token == None:
+        abort(401)
+    else:
+        return token
 
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['GET'])
 def get_all():
@@ -22,12 +37,11 @@ def get_all():
 
 @app.route('/MOCTracker/api/v1.0/tracks/<int:track_id>', methods=['GET'])
 def get_track(track_id):
-    try:
-        track = MOCTrackerApp.getTrack(track_id)
-    except:
+    track = MOCTrackerApp.getTrack(track_id)
+    if track == None:
         abort(404)
-        
-    return track
+    else:
+        return track
     
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['POST'])
 def insert_track():
