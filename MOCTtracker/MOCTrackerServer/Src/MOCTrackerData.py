@@ -5,6 +5,7 @@ Created on 21 Jul 2017
 '''
 
 import psycopg2
+import datetime
 
 
 connect = "dbname='MOCdb' user='MOC_andrew' host='//localhost' password='iolabr0n'"
@@ -115,7 +116,23 @@ def insertUser(inUser):
 
     return
 
-
+def updateToken(user_id, token):
+    expiry=datetime.datetime.now() + datetime.timedelta(days=1)
+    try:
+        db = psycopg2.connect(connect)
+    except:
+        raise ("Unable to connect to the database", 500)  
+    if isinstance(user_id, str):
+        userid = user_id
+    else:
+        userid = str(user_id, 'utf-8')
+ 
+    cur = db.cursor()
+    SQL="UPDATE moctracker.users SET token = %s, token_expiry = %s WHERE user_id = %s;"
+    data=(str(token), str(expiry), userid)
+    db.commit()
+    return
+    
 
 def buildTrack(row):
     created_on = row[2].strftime('%Y-%m-%d %H:%M:%S')

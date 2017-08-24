@@ -27,7 +27,7 @@ def login():
     if token == None:
         abort(401)
     else:
-        return token
+        return 'xx'
 
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['GET'])
 def get_all():
