@@ -7,6 +7,7 @@ Created on 20 Jul 2017
 import MOCTrackerData
 import json
 import uuid
+import datetime
 from passlib.hash import pbkdf2_sha256
 
 
@@ -60,10 +61,12 @@ def getUser(user_id):
         user = MOCTrackerData.getUser(user_id)
     except:
         raise
+    print ('help')
     if user == None:
-        response = None
+        response = None        
     else:
         response = json.dumps(user)
+    print ('bugger')
     return response
 
 def insertUser(inUser):
@@ -73,6 +76,17 @@ def insertUser(inUser):
         raise
 
     return 
+
+def checkToken(token):
+    session=MOCTrackerData.getSession(token)
+    print (session)
+    
+    if session == None:
+        return False
+
+    if datetime.datetime.now() > datetime.datetime.strptime(session['token_expiry'], '%Y-%m-%d %H:%M:%S'):
+        return False
+    return True
 
 
 if __name__ == '__main__':

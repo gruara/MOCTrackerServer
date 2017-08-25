@@ -3,8 +3,8 @@ Created on 20 Jul 2017
 
 @author: Andrew
 '''
-from flask import Flask, abort, request, jsonify
-from flask import abort
+from flask import Flask, abort, request, jsonify,  Response
+
 import MOCTrackerApp
 import json
 from base64 import b64decode
@@ -27,7 +27,9 @@ def login():
     if token == None:
         abort(401)
     else:
-        return 'xx'
+        resp=Response('OK')
+        resp.headers['Authorization']=token
+        return resp
 
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['GET'])
 def get_all():
@@ -60,13 +62,16 @@ def update_track(account):
 
 @app.route('/MOCTracker/api/v1.0/users/<string:user_id>', methods=['GET'])
 def get_user(user_id):
+    token=request.headers.get('Authorization')
+    if MOCTrackerApp.checkToken(token) is False:
+        abort(401)
 
-    try:
-        track = MOCTrackerApp.getUser(user_id)
-    except:
+    
+    user = MOCTrackerApp.getUser(user_id)
+    if user == None:
         abort(404)
-        
-    return track
+    else:
+        return user
 
 @app.route('/MOCTracker/api/v1.0/users', methods=['POST'])
 def insert_user():

@@ -72,11 +72,13 @@ def insertTrack(inTrack):
     return
 
 def getUser (user_id):
+    print ('hey ho lets go')
+    
     try:
         db = psycopg2.connect(connect)
     except:
         raise ("Unable to connect to the database", 500)   
-#    print (type(user_id))
+    print (type(user_id))
     if isinstance(user_id, str):
         userid = user_id
     else:
@@ -86,9 +88,9 @@ def getUser (user_id):
     SQL="SELECT id, user_id, name, created_on, password FROM moctracker.users WHERE user_id = %s;"
     data=(userid, )
     cur.execute(SQL, data)
-#     yy=cur.mogrify(SQL, data)
-#     print(yy)
-#     print (cur.rowcount)
+    yy=cur.mogrify(SQL, data)
+    print(yy)
+    print (cur.rowcount)
     if cur.rowcount == 1:
         row = cur.fetchone()
         user = buildUser(row)
@@ -107,17 +109,17 @@ def insertUser(inUser):
     SQL="INSERT INTO moctracker.users (user_id, name, created_on) VALUES (%s, %s, %s) RETURNING id;"
     data=(inUser['user_id'], inUser['name'], inUser['created_on'])
     cur.execute(SQL, data)
-#    yy=cur.mogrify(SQL, data)
-#    zz=cur.statusmessage
-#    print(yy)
-#    print(zz)
+    yy=cur.mogrify(SQL, data)
+    zz=cur.statusmessage
+    print(yy)
+    print(zz)
     id=cur.fetchone()[0]
     db.commit()
 
     return
 
 def updateToken(user_id, token):
-    expiry=datetime.datetime.now() + datetime.timedelta(days=1)
+    expiry=datetime.datetime.now() + datetime.timedelta(minutes=1440)
     try:
         db = psycopg2.connect(connect)
     except:
@@ -130,9 +132,33 @@ def updateToken(user_id, token):
     cur = db.cursor()
     SQL="UPDATE moctracker.users SET token = %s, token_expiry = %s WHERE user_id = %s;"
     data=(str(token), str(expiry), userid)
+    cur.execute(SQL, data)
+    yy=cur.mogrify(SQL, data)
+    zz=cur.statusmessage
+    print(yy)
+    print(zz)
     db.commit()
     return
-    
+
+def getSession(token):
+    try:
+        db = psycopg2.connect(connect)
+    except:
+        raise ("Unable to connect to the database", 500)  
+    cur = db.cursor()
+    SQL="SELECT  user_id, token_expiry FROM moctracker.users WHERE token = %s;"
+    data=(str(token), )
+    cur.execute(SQL, data)
+    yy=cur.mogrify(SQL, data)
+    print(yy)
+    print (cur.rowcount)
+    if cur.rowcount == 1:
+        row = cur.fetchone()
+        session = buildSession(row)
+    else:
+        session = None
+    return session
+   
 
 def buildTrack(row):
     created_on = row[2].strftime('%Y-%m-%d %H:%M:%S')
@@ -157,6 +183,16 @@ def buildUser(row):
         }
 #    print(row[4])
     return user
+
+def buildSession(row):
+    token_expiry = row[1].strftime('%Y-%m-%d %H:%M:%S')
+    
+    session = {
+            'user_id' : row[0],
+            'token_expiry' : token_expiry,
+        }
+#    print(row[4])
+    return session
 
 if __name__ == '__main__':
     pass    
