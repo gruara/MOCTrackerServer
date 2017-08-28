@@ -8,6 +8,7 @@ from flask import Flask, abort, request, jsonify,  Response
 import MOCTrackerApp
 import json
 from base64 import b64decode
+from MOCTrackerApp import session
 
 app = Flask(__name__)
 
@@ -33,12 +34,21 @@ def login():
 
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['GET'])
 def get_all():
+    token=request.headers.get('Authorization')
+    if MOCTrackerApp.checkToken(token) is False:
+        abort(401)
+    
+    print(MOCTrackerApp.session['user_id'])
 #    resp = 'You going to get it all'
-    tracks = MOCTrackerApp.getTracks()
+    tracks = MOCTrackerApp.getTracks(MOCTrackerApp.session['user_id'])
     return tracks
 
 @app.route('/MOCTracker/api/v1.0/tracks/<int:track_id>', methods=['GET'])
 def get_track(track_id):
+    token=request.headers.get('Authorization')
+    if MOCTrackerApp.checkToken(token) is False:
+        abort(401)
+
     track = MOCTrackerApp.getTrack(track_id)
     if track == None:
         abort(404)
@@ -47,6 +57,11 @@ def get_track(track_id):
     
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['POST'])
 def insert_track():
+    token=request.headers.get('Authorization')
+    if MOCTrackerApp.checkToken(token) is False:
+        abort(401)
+    
+    
     inTrack=request.get_json(force=True)
 #    print(inTrack)
     try:
@@ -75,6 +90,10 @@ def get_user(user_id):
 
 @app.route('/MOCTracker/api/v1.0/users', methods=['POST'])
 def insert_user():
+    token=request.headers.get('Authorization')
+    if MOCTrackerApp.checkToken(token) is False:
+        abort(401)
+    
     inUser=request.get_json(force=True)
 #    print(inTrack)
     try:

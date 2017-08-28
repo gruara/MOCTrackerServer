@@ -10,6 +10,8 @@ import uuid
 import datetime
 from passlib.hash import pbkdf2_sha256
 
+session = {}
+
 
 def login(username, password):
 #    print (type(username))
@@ -20,7 +22,7 @@ def login(username, password):
         storedhash=user['password']
         if pbkdf2_sha256.verify(password, storedhash):
             token=uuid.uuid4()
-            print (type(token))
+#            print (type(token))
             MOCTrackerData.updateToken(username, token)
         else:
             token = None
@@ -38,9 +40,9 @@ def getTrack(track_id):
     response = json.dumps(track)
     return response
 
-def getTracks():
+def getTracks(user_id):
     try:
-        tracks = MOCTrackerData.getTracks()
+        tracks = MOCTrackerData.getTracks(user_id)
     except:
         raise
     response = json.dumps(tracks)
@@ -66,7 +68,6 @@ def getUser(user_id):
         response = None        
     else:
         response = json.dumps(user)
-    print ('bugger')
     return response
 
 def insertUser(inUser):
@@ -78,6 +79,8 @@ def insertUser(inUser):
     return 
 
 def checkToken(token):
+    global session
+    
     session=MOCTrackerData.getSession(token)
     print (session)
     

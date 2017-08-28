@@ -30,7 +30,7 @@ def getTrack (track_id):
     track = buildTrack(row)
     return track
 
-def getTracks ():
+def getTracks(user_id):
     try:
         db = psycopg2.connect(connect)
     except:
@@ -38,9 +38,9 @@ def getTracks ():
      
     cur = db.cursor()
     
-    SQL="SELECT * FROM moctracker.tracks;"
-#    data=(track_id, )
-    cur.execute(SQL, )
+    SQL="SELECT * FROM moctracker.tracks WHERE user_id = %s;"
+    data=(user_id, )
+    cur.execute(SQL, data )
     if cur.rowcount > 0:
         rows = cur.fetchall()
     else:
@@ -72,13 +72,12 @@ def insertTrack(inTrack):
     return
 
 def getUser (user_id):
-    print ('hey ho lets go')
     
     try:
         db = psycopg2.connect(connect)
     except:
         raise ("Unable to connect to the database", 500)   
-    print (type(user_id))
+#    print (type(user_id))
     if isinstance(user_id, str):
         userid = user_id
     else:
@@ -88,9 +87,9 @@ def getUser (user_id):
     SQL="SELECT id, user_id, name, created_on, password FROM moctracker.users WHERE user_id = %s;"
     data=(userid, )
     cur.execute(SQL, data)
-    yy=cur.mogrify(SQL, data)
-    print(yy)
-    print (cur.rowcount)
+#     yy=cur.mogrify(SQL, data)
+#     print(yy)
+#     print (cur.rowcount)
     if cur.rowcount == 1:
         row = cur.fetchone()
         user = buildUser(row)
@@ -133,10 +132,10 @@ def updateToken(user_id, token):
     SQL="UPDATE moctracker.users SET token = %s, token_expiry = %s WHERE user_id = %s;"
     data=(str(token), str(expiry), userid)
     cur.execute(SQL, data)
-    yy=cur.mogrify(SQL, data)
-    zz=cur.statusmessage
-    print(yy)
-    print(zz)
+#     yy=cur.mogrify(SQL, data)
+#     zz=cur.statusmessage
+#     print(yy)
+#     print(zz)
     db.commit()
     return
 
@@ -149,9 +148,9 @@ def getSession(token):
     SQL="SELECT  user_id, token_expiry FROM moctracker.users WHERE token = %s;"
     data=(str(token), )
     cur.execute(SQL, data)
-    yy=cur.mogrify(SQL, data)
-    print(yy)
-    print (cur.rowcount)
+#     yy=cur.mogrify(SQL, data)
+#     print(yy)
+#     print (cur.rowcount)
     if cur.rowcount == 1:
         row = cur.fetchone()
         session = buildSession(row)
