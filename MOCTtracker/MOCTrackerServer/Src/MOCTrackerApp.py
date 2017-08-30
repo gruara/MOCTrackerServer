@@ -31,6 +31,27 @@ def login(username, password):
 #    print (hash)
     return token
 
+def changePassword(user_id, passwords):
+    print ('yipee')
+    user = MOCTrackerData.getUser(user_id)
+    print (user)
+    print (passwords)
+    if user == None:
+        passhash = None
+    else:
+        if user['password'] is None and passwords['old_password'] == '':
+            passhash = pbkdf2_sha256.hash(passwords['new_password'])
+        else:
+            print ('billy boy')
+            storedhash = user['password']
+            if pbkdf2_sha256.verify(passwords['old_password'], storedhash):
+                passhash = pbkdf2_sha256.hash(passwords['new_password'])
+            else:
+                passhash = None
+    if passhash is not None:
+        MOCTrackerData.updatePassword(user_id, passhash)
+        passhash = 'Password updated'
+    return passhash
 
 def getTrack(track_id):
     try:

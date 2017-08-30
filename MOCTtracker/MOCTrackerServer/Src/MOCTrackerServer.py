@@ -18,7 +18,7 @@ def hello_world():
 
 @app.route('/MOCTracker/api/v1.0/login', methods=['GET'])
 def login():
-    
+    print ('what here')
     authorization64=request.headers.get('Authorization')
     authorization=b64decode(authorization64)
 
@@ -32,6 +32,21 @@ def login():
         resp.headers['Authorization']=token
         return resp
 
+
+@app.route('/MOCTracker/api/v1.0/login/<string:user_id>', methods=['PUT'])
+def update_password(user_id):
+#     token = request.headers.get('Authorization')
+#     if MOCTrackerApp.checkToken(token) is False:
+#         abort(401)
+    changePass = request.get_json(force=True)
+    updated_pass = MOCTrackerApp.changePassword(user_id, changePass)
+    print(updated_pass)
+    if updated_pass is None:
+        abort(401)
+
+    return updated_pass
+    
+    
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['GET'])
 def get_all():
     token=request.headers.get('Authorization')
@@ -70,7 +85,7 @@ def insert_track():
         return 
     return "Inserted"
  
-@app.route('/MOCTracker/api/v1.0/tracks/<int:account>', methods=['POST'])
+@app.route('/MOCTracker/api/v1.0/tracks/<int:account>', methods=['PUT'])
 def update_track(account):
 #    xx = request.json
     return "I've been upputted" 

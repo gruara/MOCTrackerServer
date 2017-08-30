@@ -108,10 +108,10 @@ def insertUser(inUser):
     SQL="INSERT INTO moctracker.users (user_id, name, created_on) VALUES (%s, %s, %s) RETURNING id;"
     data=(inUser['user_id'], inUser['name'], inUser['created_on'])
     cur.execute(SQL, data)
-    yy=cur.mogrify(SQL, data)
-    zz=cur.statusmessage
-    print(yy)
-    print(zz)
+#     yy=cur.mogrify(SQL, data)
+#     zz=cur.statusmessage
+#     print(yy)
+#     print(zz)
     id=cur.fetchone()[0]
     db.commit()
 
@@ -131,6 +131,27 @@ def updateToken(user_id, token):
     cur = db.cursor()
     SQL="UPDATE moctracker.users SET token = %s, token_expiry = %s WHERE user_id = %s;"
     data=(str(token), str(expiry), userid)
+    cur.execute(SQL, data)
+#     yy=cur.mogrify(SQL, data)
+#     zz=cur.statusmessage
+#     print(yy)
+#     print(zz)
+    db.commit()
+    return
+
+def updatePassword(user_id, password_hash):
+    try:
+        db = psycopg2.connect(connect)
+    except:
+        raise ("Unable to connect to the database", 500)  
+    if isinstance(user_id, str):
+        userid = user_id
+    else:
+        userid = str(user_id, 'utf-8')
+ 
+    cur = db.cursor()
+    SQL="UPDATE moctracker.users SET password = %s WHERE user_id = %s;"
+    data=(str(password_hash), userid)
     cur.execute(SQL, data)
 #     yy=cur.mogrify(SQL, data)
 #     zz=cur.statusmessage
