@@ -18,18 +18,18 @@ def hello_world():
 
 @app.route('/MOCTracker/api/v1.0/login', methods=['GET'])
 def login():
-    print ('what here')
-    authorization64=request.headers.get('Authorization')
-    authorization=b64decode(authorization64)
+#    print ('what here')
+    authorization64 = request.headers.get('Authorization')
+    authorization = b64decode(authorization64)
 
 # b':' is used in split as getting error ' bytes-like object is required, not 'str'' without it'
-    username, password=authorization.split(b':', 1)
-    token=MOCTrackerApp.login(username, password)
+    username, password = authorization.split(b':', 1)
+    token = MOCTrackerApp.login(username, password)
     if token == None:
         abort(401)
     else:
-        resp=Response('OK')
-        resp.headers['Authorization']=token
+        resp = Response('OK')
+        resp.headers['Authorization'] = token
         return resp
 
 
@@ -40,7 +40,6 @@ def update_password(user_id):
 #         abort(401)
     changePass = request.get_json(force=True)
     updated_pass = MOCTrackerApp.changePassword(user_id, changePass)
-    print(updated_pass)
     if updated_pass is None:
         abort(401)
 
@@ -49,18 +48,18 @@ def update_password(user_id):
     
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['GET'])
 def get_all():
-    token=request.headers.get('Authorization')
+    token = request.headers.get('Authorization')
     if MOCTrackerApp.checkToken(token) is False:
         abort(401)
     
-    print(MOCTrackerApp.session['user_id'])
+#    print(MOCTrackerApp.session['user_id'])
 #    resp = 'You going to get it all'
     tracks = MOCTrackerApp.getTracks(MOCTrackerApp.session['user_id'])
     return tracks
 
 @app.route('/MOCTracker/api/v1.0/tracks/<int:track_id>', methods=['GET'])
 def get_track(track_id):
-    token=request.headers.get('Authorization')
+    token = request.headers.get('Authorization')
     if MOCTrackerApp.checkToken(token) is False:
         abort(401)
 
@@ -72,12 +71,12 @@ def get_track(track_id):
     
 @app.route('/MOCTracker/api/v1.0/tracks', methods=['POST'])
 def insert_track():
-    token=request.headers.get('Authorization')
+    token = request.headers.get('Authorization')
     if MOCTrackerApp.checkToken(token) is False:
         abort(401)
     
     
-    inTrack=request.get_json(force=True)
+    inTrack = request.get_json(force=True)
 #    print(inTrack)
     try:
         resp = MOCTrackerApp.insertTrack(inTrack)
@@ -92,7 +91,7 @@ def update_track(account):
 
 @app.route('/MOCTracker/api/v1.0/users/<string:user_id>', methods=['GET'])
 def get_user(user_id):
-    token=request.headers.get('Authorization')
+    token = request.headers.get('Authorization')
     if MOCTrackerApp.checkToken(token) is False:
         abort(401)
 
@@ -105,11 +104,11 @@ def get_user(user_id):
 
 @app.route('/MOCTracker/api/v1.0/users', methods=['POST'])
 def insert_user():
-    token=request.headers.get('Authorization')
+    token = request.headers.get('Authorization')
     if MOCTrackerApp.checkToken(token) is False:
         abort(401)
     
-    inUser=request.get_json(force=True)
+    inUser = request.get_json(force=True)
 #    print(inTrack)
     try:
         resp = MOCTrackerApp.insertUser(inUser)

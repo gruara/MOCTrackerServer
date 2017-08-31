@@ -15,13 +15,13 @@ session = {}
 
 def login(username, password):
 #    print (type(username))
-    user=MOCTrackerData.getUser(username)
+    user = MOCTrackerData.getUser(username)
     if user == None:
         token = None
     else:
-        storedhash=user['password']
+        storedhash = user['password']
         if pbkdf2_sha256.verify(password, storedhash):
-            token=uuid.uuid4()
+            token = uuid.uuid4()
 #            print (type(token))
             MOCTrackerData.updateToken(username, token)
         else:
@@ -32,17 +32,14 @@ def login(username, password):
     return token
 
 def changePassword(user_id, passwords):
-    print ('yipee')
     user = MOCTrackerData.getUser(user_id)
-    print (user)
-    print (passwords)
     if user == None:
         passhash = None
     else:
         if user['password'] is None and passwords['old_password'] == '':
             passhash = pbkdf2_sha256.hash(passwords['new_password'])
         else:
-            print ('billy boy')
+
             storedhash = user['password']
             if pbkdf2_sha256.verify(passwords['old_password'], storedhash):
                 passhash = pbkdf2_sha256.hash(passwords['new_password'])
@@ -84,7 +81,6 @@ def getUser(user_id):
         user = MOCTrackerData.getUser(user_id)
     except:
         raise
-    print ('help')
     if user == None:
         response = None        
     else:
@@ -102,13 +98,13 @@ def insertUser(inUser):
 def checkToken(token):
     global session
     
-    session=MOCTrackerData.getSession(token)
-    print (session)
-    
+    session = MOCTrackerData.getSession(token)
     if session == None:
         return False
 
-    if datetime.datetime.now() > datetime.datetime.strptime(session['token_expiry'], '%Y-%m-%d %H:%M:%S'):
+    if datetime.datetime.now() > \
+       datetime.datetime.strptime(session['token_expiry'], 
+                                          '%Y-%m-%d %H:%M:%S'):
         return False
     return True
 

@@ -7,7 +7,6 @@ Created on 21 Jul 2017
 import psycopg2
 import datetime
 
-
 connect = "dbname='MOCdb' user='MOC_andrew' host='//localhost' password='iolabr0n'"
 
 def getTrack (track_id):
@@ -18,8 +17,10 @@ def getTrack (track_id):
      
     cur = db.cursor()
     
-    SQL="SELECT * FROM moctracker.tracks WHERE id = %s;"
-    data=(track_id, )
+    SQL="""SELECT * 
+           FROM moctracker.tracks 
+           WHERE id = %s;"""
+    data = (track_id, )
     cur.execute(SQL, data)
   
     if cur.rowcount == 1:
@@ -28,6 +29,7 @@ def getTrack (track_id):
         raise ('Track not found', 404)
         
     track = buildTrack(row)
+    db.close
     return track
 
 def getTracks(user_id):
@@ -38,8 +40,10 @@ def getTracks(user_id):
      
     cur = db.cursor()
     
-    SQL="SELECT * FROM moctracker.tracks WHERE user_id = %s;"
-    data=(user_id, )
+    SQL = """SELECT * 
+             FROM moctracker.tracks 
+             WHERE user_id = %s;"""
+    data = (user_id, )
     cur.execute(SQL, data )
     if cur.rowcount > 0:
         rows = cur.fetchall()
@@ -49,6 +53,7 @@ def getTracks(user_id):
     for row in rows:    
         track = buildTrack(row)
         tracks.append(track)
+    db.close
     return tracks
 
 
@@ -59,16 +64,20 @@ def insertTrack(inTrack):
     except:
         raise ("Unable to connect to the database", 500)   
     cur = db.cursor()
-    SQL="INSERT INTO moctracker.tracks (user_id, created_on) VALUES (%s, %s) RETURNING id;"
-    data=(inTrack['user_id'], inTrack['created_on'])
+    SQL = """INSERT INTO moctracker.tracks 
+                (user_id,
+                 created_on) 
+             VALUES (%s, %s) 
+             RETURNING id;"""
+    data = (inTrack['user_id'], inTrack['created_on'])
     cur.execute(SQL, data)
 #    yy=cur.mogrify(SQL, data)
 #    zz=cur.statusmessage
 #    print(yy)
 #    print(zz)
-    id=cur.fetchone()[0]
+    id = cur.fetchone()[0]
     db.commit()
-
+    db.close
     return
 
 def getUser (user_id):
@@ -84,8 +93,14 @@ def getUser (user_id):
         userid = str(user_id, 'utf-8')
         
     cur = db.cursor()
-    SQL="SELECT id, user_id, name, created_on, password FROM moctracker.users WHERE user_id = %s;"
-    data=(userid, )
+    SQL = """SELECT id,
+                    user_id,
+                    name,
+                    created_on, 
+                    password 
+             FROM moctracker.users 
+             WHERE user_id = %s;"""
+    data = (userid, )
     cur.execute(SQL, data)
 #     yy=cur.mogrify(SQL, data)
 #     print(yy)
@@ -96,7 +111,7 @@ def getUser (user_id):
     else:
         user = None
         
-
+    db.close
     return user
 
 def insertUser(inUser):
@@ -105,20 +120,26 @@ def insertUser(inUser):
     except:
         raise ("Unable to connect to the database", 500)   
     cur = db.cursor()
-    SQL="INSERT INTO moctracker.users (user_id, name, created_on) VALUES (%s, %s, %s) RETURNING id;"
-    data=(inUser['user_id'], inUser['name'], inUser['created_on'])
+    SQL = """INSERT INTO moctracker.users 
+                (user_id, 
+                 name, 
+                 created_on) 
+             VALUES (%s, %s, %s) 
+             RETURNING id;"""
+    data = (inUser['user_id'], inUser['name'], inUser['created_on'])
     cur.execute(SQL, data)
 #     yy=cur.mogrify(SQL, data)
 #     zz=cur.statusmessage
 #     print(yy)
 #     print(zz)
-    id=cur.fetchone()[0]
-    db.commit()
+    id = cur.fetchone()[0]
 
+    db.commit()
+    db.close
     return
 
 def updateToken(user_id, token):
-    expiry=datetime.datetime.now() + datetime.timedelta(minutes=1440)
+    expiry = datetime.datetime.now() + datetime.timedelta(minutes=1440)
     try:
         db = psycopg2.connect(connect)
     except:
@@ -129,14 +150,18 @@ def updateToken(user_id, token):
         userid = str(user_id, 'utf-8')
  
     cur = db.cursor()
-    SQL="UPDATE moctracker.users SET token = %s, token_expiry = %s WHERE user_id = %s;"
-    data=(str(token), str(expiry), userid)
+    SQL = """UPDATE moctracker.users 
+             SET token = %s, 
+                 token_expiry = %s 
+             WHERE user_id = %s;"""
+    data = (str(token), str(expiry), userid)
     cur.execute(SQL, data)
 #     yy=cur.mogrify(SQL, data)
 #     zz=cur.statusmessage
 #     print(yy)
 #     print(zz)
     db.commit()
+    db.close
     return
 
 def updatePassword(user_id, password_hash):
@@ -150,24 +175,27 @@ def updatePassword(user_id, password_hash):
         userid = str(user_id, 'utf-8')
  
     cur = db.cursor()
-    SQL="UPDATE moctracker.users SET password = %s WHERE user_id = %s;"
-    data=(str(password_hash), userid)
+    SQL = """UPDATE moctracker.users 
+             SET password = %s 
+             WHERE user_id = %s;"""
+    data = (str(password_hash), userid)
     cur.execute(SQL, data)
 #     yy=cur.mogrify(SQL, data)
 #     zz=cur.statusmessage
 #     print(yy)
 #     print(zz)
     db.commit()
+    db.close
     return
 
 def getSession(token):
-    try:
-        db = psycopg2.connect(connect)
-    except:
-        raise ("Unable to connect to the database", 500)  
+
+    db = psycopg2.connect(connect)
     cur = db.cursor()
-    SQL="SELECT  user_id, token_expiry FROM moctracker.users WHERE token = %s;"
-    data=(str(token), )
+    SQL = """SELECT  user_id, token_expiry 
+             FROM moctracker.users 
+             WHERE token = %s;"""
+    data = (str(token), )
     cur.execute(SQL, data)
 #     yy=cur.mogrify(SQL, data)
 #     print(yy)
@@ -177,6 +205,7 @@ def getSession(token):
         session = buildSession(row)
     else:
         session = None
+    db.close
     return session
    
 
@@ -213,6 +242,7 @@ def buildSession(row):
         }
 #    print(row[4])
     return session
+
 
 if __name__ == '__main__':
     pass    
