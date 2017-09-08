@@ -1,7 +1,7 @@
 '''
 Created on 20 Jul 2017
 
-@author: Andrew Gruar   xxxxx   xxx
+@author: Andrew Gruar
 '''
 
 import MOCTrackerData
