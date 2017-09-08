@@ -25,10 +25,10 @@ def getTrack (track_id):
   
     if cur.rowcount == 1:
         row = cur.fetchone()
+        track = buildTrack(row)
     else:
-        raise ('Track not found', 404)
+        track = None
         
-    track = buildTrack(row)
     db.close
     return track
 
@@ -47,12 +47,13 @@ def getTracks(user_id):
     cur.execute(SQL, data )
     if cur.rowcount > 0:
         rows = cur.fetchall()
+        tracks = []
+        for row in rows:    
+            track = buildTrack(row)
+            tracks.append(track)
     else:
-        raise ('Track not found', 404)
-    tracks = []
-    for row in rows:    
-        track = buildTrack(row)
-        tracks.append(track)
+        tracks = None
+        
     db.close
     return tracks
 

@@ -55,7 +55,10 @@ def getTrack(track_id):
         track = MOCTrackerData.getTrack(track_id)
     except:
         raise
-    response = json.dumps(track)
+    if track is None:
+        response = None
+    else:
+        response = json.dumps(track)
     return response
 
 def getTracks(user_id):
@@ -63,7 +66,10 @@ def getTracks(user_id):
         tracks = MOCTrackerData.getTracks(user_id)
     except:
         raise
-    response = json.dumps(tracks)
+    if tracks is None:
+        response = None
+    else:
+        response = json.dumps(tracks)
     return response
 
 
@@ -81,7 +87,7 @@ def getUser(user_id):
         user = MOCTrackerData.getUser(user_id)
     except:
         raise
-    if user == None:
+    if user is None:
         response = None        
     else:
         response = json.dumps(user)
