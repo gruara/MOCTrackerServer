@@ -1,7 +1,7 @@
 '''
 Created on 21 Jul 2017
 
-@author: Andrew
+@author: Andrew Gruar
 '''
 
 import psycopg2

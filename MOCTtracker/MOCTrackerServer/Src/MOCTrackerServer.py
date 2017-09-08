@@ -1,7 +1,7 @@
 '''
 Created on 20 Jul 2017
 
-@author: Andrew
+@author: Andrew Gruar
 '''
 from flask import Flask, abort, request, jsonify,  Response
 
